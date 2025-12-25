@@ -1,0 +1,382 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pola Peminggiran Masyarakat Adat - Visualisasi Data</title>
+    <style>
+        :root {
+            --bg-color: #f4f1ea;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --accent-adat: #8d6e63; /* Earthy Brown */
+            --accent-state: #546e7a; /* Bureaucratic Blue/Grey */
+            --highlight: #d32f2f; /* Alert Red */
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            background-image: radial-gradient(#d7ccc8 1px, transparent 1px);
+            background-size: 20px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER & LOGO STYLES */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            /* REVISI: Memberi jarak atas agar judul turun ke bawah logo */
+            padding-top: 90px; 
+            position: relative; 
+        }
+
+        .konde-logo {
+            position: absolute;
+            top: 20px; /* Sedikit turun dari tepi atas layar */
+            right: 0;
+            max-width: 150px; 
+            height: auto;
+            z-index: 10;
+        }
+
+        h1 {
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 3px solid var(--accent-adat);
+            display: inline-block;
+            padding-bottom: 10px;
+            margin-top: 10px;
+            /* REVISI: Mengatur line-height agar judul panjang lebih rapi */
+            line-height: 1.4; 
+        }
+
+        .subtitle {
+            font-style: italic;
+            color: var(--accent-state);
+            margin-top: 15px;
+        }
+
+        /* Container for the cards */
+        .timeline-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            flex: 1; 
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--card-bg);
+            border-left: 6px solid var(--accent-state);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+
+        /* Header part of the card (Always visible) */
+        .card-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .step-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: rgba(0,0,0,0.1);
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            z-index: 0;
+        }
+
+        .header-content {
+            z-index: 1;
+            padding-right: 40px; 
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .card-causal {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: var(--highlight);
+            margin-top: 5px;
+            background: rgba(211, 47, 47, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .expand-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+            z-index: 1;
+        }
+
+        /* Content part (Hidden by default) */
+        .card-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+            background-color: #fafafa;
+            border-top: 1px solid #eee;
+        }
+
+        .body-inner {
+            padding: 20px;
+        }
+
+        .explanation {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .data-point {
+            background-color: #eceff1;
+            padding: 10px;
+            border-left: 4px solid var(--accent-state);
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .case-study {
+            background-color: #efebe9; 
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px dashed var(--accent-adat);
+        }
+
+        .case-title {
+            font-weight: bold;
+            color: var(--accent-adat);
+            display: block;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        /* Active State */
+        .card.active {
+            border-left-color: var(--highlight);
+        }
+        
+        .card.active .card-body {
+            max-height: 1000px; 
+        }
+        
+        .card.active .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        /* FOOTER STYLES */
+        footer {
+            text-align: right;
+            font-style: italic;
+            margin-top: 50px;
+            padding: 20px 0;
+            font-size: 0.9rem;
+            color: var(--accent-state);
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Responsiveness tweaks */
+        @media (max-width: 600px) {
+            header {
+                /* REVISI: Menambah padding top lebih banyak di mobile karena logo di tengah */
+                padding-top: 120px; 
+            }
+            .konde-logo {
+                top: 20px;
+                right: 50%;
+                transform: translateX(50%); 
+                max-width: 130px;
+            }
+            footer {
+                 text-align: center; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://www.konde.co/wp-content/uploads/2020/11/LOGO-KONDE.png" alt="Logo Konde.co" class="konde-logo">
+        
+        <h1>Pola Peminggiran Masyarakat Adat dan Pejuang Hak Atas Tanah Serta Ruang Hidup</h1>
+        <div class="subtitle">Klik pada kartu untuk menelusuri pola sistemik kriminalisasi masyarakat adat dan pejuang hak atas tanah</div>
+    </header>
+
+    <div class="timeline-container">
+
+        <div class="card" onclick="toggleCard(this)">
+            <div class="step-number">01</div>
+            <div class="card-header">
+                <div class="header-content">
+                    <h2 class="card-title">Pengkategorian Negara</h2>
+                    <div class="card-causal">Wilayah Adat &rarr; Tanah Negara</div>
+                </div>
+                <div class="expand-icon">&#9662;</div>
+            </div>
+            <div class="card-body">
+                <div class="body-inner">
+                    <p class="explanation">
+                        Penghapusan eksistensi legal wilayah adat melalui klasifikasi administratif. Negara secara sepihak menetapkan wilayah hidup masyarakat sebagai kawasan hutan, APL, atau zona proyek strategis tanpa mengakui sejarah sosial yang ada.
+                    </p>
+                    <div class="data-point">
+                        <strong>Mekanisme:</strong> Labelisasi "Kawasan Hutan" atau "Proyek Strategis Nasional" (PSN) menjadi alat legitimasi pengambilalihan lahan.
+                    </div>
+                    <div class="case-study">
+                        <span class="case-title">Studi Kasus: Merauke, Papua Selatan</span>
+                        Wilayah adat suku Malind dikategorikan sepihak sebagai wilayah pengembangan pangan nasional, mengabaikan sistem pengelolaan hutan sagu yang telah berjalan turun-temurun.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" onclick="toggleCard(this)">
+            <div class="step-number">02</div>
+            <div class="card-header">
+                <div class="header-content">
+                    <h2 class="card-title">Perizinan Eksklusif (Tanpa FPIC)</h2>
+                    <div class="card-causal">Klaim Negara &rarr; Izin Korporasi</div>
+                </div>
+                <div class="expand-icon">&#9662;</div>
+            </div>
+            <div class="card-body">
+                <div class="body-inner">
+                    <p class="explanation">
+                        Privatisasi wilayah adat. Setelah diklaim negara, hak legal pengelolaan diberikan kepada korporasi (Sawit, Tambang, Karbon) tanpa persetujuan bebas, didahulukan dan diinformasikan (FPIC) dari masyarakat.
+                    </p>
+                    <div class="data-point">
+                        <strong>Ketimpangan:</strong> Perusahaan memegang dokumen legal negara, sementara masyarakat adat hanya memegang memori kolektif yang tidak diakui hukum positif.
+                    </div>
+                    <div class="case-study">
+                        <span class="case-title">Studi Kasus: Kalimantan & Merauke</span>
+                        Izin tambang dan sawit diterbitkan di atas wilayah adat Dayak tanpa persetujuan kolektif. Di Merauke, hutan dibuka untuk korporasi pangan.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" onclick="toggleCard(this)">
+            <div class="step-number">03</div>
+            <div class="card-header">
+                <div class="header-content">
+                    <h2 class="card-title">Pendekatan Pecah Belah</h2>
+                    <div class="card-causal">Penolakan Warga &rarr; Konflik Horizontal</div>
+                </div>
+                <div class="expand-icon">&#9662;</div>
+            </div>
+            <div class="card-body">
+                <div class="body-inner">
+                    <p class="explanation">
+                        Pelemahan resistensi melalui <i>Elite Capture</i>. Perusahaan atau negara mendekati tokoh tertentu dengan janji kompensasi selektif untuk menciptakan perpecahan internal di komunitas.
+                    </p>
+                    <div class="data-point">
+                        <strong>Taktik:</strong> Narasi "Proyek demi Kemajuan" dibenturkan dengan sikap kritis warga, menciptakan label "anti-pembangunan".
+                    </div>
+                    <div class="case-study">
+                        <span class="case-title">Studi Kasus: Mentawai & Sulawesi</span>
+                        Elite lokal dirangkul untuk menyetujui proyek, sementara mayoritas warga menolak. Konflik bergeser menjadi antar-anggota masyarakat, bukan lagi masyarakat vs perusahaan.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" onclick="toggleCard(this)">
+            <div class="step-number">04</div>
+            <div class="card-header">
+                <div class="header-content">
+                    <h2 class="card-title">Kriminalisasi</h2>
+                    <div class="card-causal">Pertahanan Wilayah &rarr; Jerat Hukum</div>
+                </div>
+                <div class="expand-icon">&#9662;</div>
+            </div>
+            <div class="card-body">
+                <div class="body-inner">
+                    <p class="explanation">
+                        Hukum sebagai senjata represif. Warga yang mempertahankan tanahnya dilaporkan, ditangkap, dan diproses hukum dengan tuduhan "merambah kawasan hutan" atau "mengganggu ketertiban".
+                    </p>
+                    <div class="data-point">
+                        <strong>Paradoks Hukum:</strong> Warga yang menjaga tanah leluhur jadi tersangka; perusahaan yang merusak lingkungan dilindungi aparat.
+                    </div>
+                    <div class="case-study">
+                        <span class="case-title">Studi Kasus: Dairi (Sumatra) & Papua</span>
+                        Petani di Dairi dikriminalisasi saat mempertahankan ladang dari PT GRUTI. Aparat bertindak bukan sebagai penengah, tapi pelindung investasi.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" onclick="toggleCard(this)">
+            <div class="step-number">05</div>
+            <div class="card-header">
+                <div class="header-content">
+                    <h2 class="card-title">Pengusiran & Kerusakan Ekologis</h2>
+                    <div class="card-causal">Eskalasi Konflik &rarr; Hilang Ruang Hidup</div>
+                </div>
+                <div class="expand-icon">&#9662;</div>
+            </div>
+            <div class="card-body">
+                <div class="body-inner">
+                    <p class="explanation">
+                        Hasil akhir dari rantai peminggiran: alienasi total. Masyarakat kehilangan tempat tinggal, sumber pangan rusak, dan ekosistem hancur, menciptakan kemiskinan struktural di tanah sendiri.
+                    </p>
+                    <div class="data-point">
+                        <strong>Dampak Permanen:</strong> Hilangnya kedaulatan pangan dan ketergantungan pada sistem ekonomi luar yang tidak adil.
+                    </div>
+                    <div class="case-study">
+                        <span class="case-title">Studi Kasus: Pulau Kei Besar & Merauke</span>
+                        Hutan sagu hilang berganti lahan tandus atau monokultur. Di pulau kecil, eksploitasi mengancam ketersediaan air bersih dan kelayakan huni pulau.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        Riset, Pengolah Data, dan Visualisasi: Luthfi Maulana Adhari
+    </footer>
+
+    <script>
+        function toggleCard(card) {
+            const allCards = document.querySelectorAll('.card');
+            allCards.forEach(c => {
+                if (c !== card && c.classList.contains('active')) {
+                    c.classList.remove('active');
+                }
+            });
+            card.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
